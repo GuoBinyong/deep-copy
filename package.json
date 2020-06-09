@@ -1,0 +1,54 @@
+{
+  "name": "deep-copy",
+  "version": "1.0.0",
+  "description": "deep-copy 提供了JSON相关的工具，如:customJSONStringify、customJSONParse 等",
+  "main": "dist/deep-copy.cjs.js",
+  "module": "dist/deep-copy.es.js",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "homepage": "https://github.com/GuoBinyong/deep-copy#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GuoBinyong/deep-copy"
+  },
+  "keywords": [
+    "JSON",
+    "tools",
+    "JSON tools",
+    "json 工具",
+    "公共代码",
+    "stringify",
+    "parse"
+  ],
+  "author": "郭斌勇",
+  "license": "ISC",
+  "files": [
+    "dist/[^.]*",
+    "types/[^.]*"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "node test/test.ts",
+    "pretest": "npm run build"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^11.1.0",
+    "@rollup/plugin-node-resolve": "^7.1.3",
+    "@rollup/plugin-typescript": "^4.1.2",
+    "@typescript-eslint/eslint-plugin": "^3.0.0",
+    "@typescript-eslint/parser": "^3.0.0",
+    "eslint": "^7.0.0",
+    "package-tls": "^1.0.2",
+    "path": "^0.12.7",
+    "rollup": "^2.7.2",
+    "rollup-plugin-terser": "^6.1.0",
+    "ts-node": "^8.9.1",
+    "tslib": "^2.0.0",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "type-reviver": "^1.0.1",
+    "type-tls": "^2.0.1"
+  }
+}
