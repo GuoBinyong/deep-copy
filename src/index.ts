@@ -23,30 +23,45 @@ function isCopyable(target:any):target is Copyable {
 interface CopyOptions<Key,Host> {
     key?:Key;
     host?:Host;
-    depth?:number;
+    startDepth?:number;
 }
 
 
-function deepCopy<V,Key,Host>(value:V,typeCopyers?:TypeRevivers<Copier>|null,options:CopyOptions<Key,Host> = {}):V {
-    if (isBaseType(value)){
+
+
+
+function deepCopy<V,Key,Host>(value:V,typeCopyers?:TypeRevivers<Copier>|null,maxDepth?:number,options:CopyOptions<Key,Host> = {}):V {
+
+
+    if (maxDepth == undefined){
+        maxDepth = Infinity;
+    }
+
+    const startDepth = options.startDepth;
+    const depth = startDepth == null ? 0 : startDepth;
+
+    /**
+     * 这里 用的是 maxDepth < depth 而不是 maxDepth <= depth ，原因如下：
+     * 当 maxDepth === depth 时，当前的 value 还是需要被拷贝的，所以还是要生成 value 的副本，如果直接返回 value ，则是没有拷贝 value
+     */
+    if (maxDepth < depth || isBaseType(value)){
         return value;
     }
 
-    let {key,host,depth} = options;
-    depth = depth == null ? 0 : depth;
 
-    let nextDepth = depth + 1;
+    const {key,host} = options;
+    const nextDepth = depth + 1;
 
-    function copyMember<T,K,H>(member:T,key?:K,host?:H,memberDepth?:number):T {
+    function copyMember<T,K,H>(member:T,key?:K,host:H|V = value,memberDepth?:number):T {
         const memDepth = memberDepth == null ? nextDepth : memberDepth;
-        return deepCopy(member,typeCopyers,{depth:memDepth,key,host});
+        return deepCopy(member,typeCopyers,maxDepth,{startDepth:memDepth,key,host});
     }
 
     const typeName = getExactTypeNameOf(value);
 
     if (typeCopyers){
         const trObj = toTypeReviverObject(typeCopyers);
-        let copier:Copier = trObj[typeName];
+        const copier:Copier = trObj[typeName];
         if (typeof copier === "function"){
             return  copier.call(host,value,copyMember,key,host,typeName,depth);
         }
@@ -58,12 +73,13 @@ function deepCopy<V,Key,Host>(value:V,typeCopyers?:TypeRevivers<Copier>|null,opt
     }
 
     if (typeof (<any>value)[Symbol.iterator] === "function"){
-        let valCopy = [];
+        const valCopy = [];
         let index = 0;
         // @ts-ignore
-        for (let item of value){
-            const itemCopy = copyMember(item,index,value,nextDepth);
+        for (const item of value){
+            const itemCopy = deepCopy(item,typeCopyers,maxDepth,{key:index,host:value,startDepth:nextDepth});
             valCopy.push(itemCopy);
+            ++index;
         }
 
         return <any>valCopy;
@@ -86,7 +102,8 @@ function deepCopy<V,Key,Host>(value:V,typeCopyers?:TypeRevivers<Copier>|null,opt
     const allKeys = Object.getOwnPropertyNames(value);
 
     return  allKeys.reduce(function (obj,key) {
-        obj[key] = (<any>value)[key];
+        let propVal = (<any>value)[key];
+        obj[key] = deepCopy(propVal,typeCopyers,maxDepth,{key,host:value,startDepth:nextDepth});
         return obj;
     },valCopy);
 
