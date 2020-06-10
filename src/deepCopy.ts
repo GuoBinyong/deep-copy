@@ -1,17 +1,8 @@
 import {TypeRevivers,toTypeReviverObject,TypeReviverMap,mergeTypeRevivers} from "type-reviver"
 import {isBaseType,getExactTypeNameOf} from "type-tls"
-import {CopyMember,Copier} from "./TypeDef"
+import {CopyMember,Copier} from "./public"
 import {presetTypeCopierArray} from "./copiers"
 
-
-
-export interface Copyable {
-    getCopy:Copier<this>;
-}
-
-export function isCopyable(target:any):target is Copyable {
-    return target && typeof target.getCopy === "function";
-}
 
 
 
@@ -146,7 +137,7 @@ export function createDeepCopy(presetTypeCopierMap?:TypeReviverMap<Copier>):Deep
 }
 
 
-
+export const defaultPresetTypeCopierMap = new Map(presetTypeCopierArray);
 
 
 export const deepCopy:DeepCopy = createDeepCopy(new Map(presetTypeCopierArray));

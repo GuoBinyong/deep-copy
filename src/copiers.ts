@@ -1,4 +1,4 @@
-import {CopyMember,copyFunction,Copier} from "./TypeDef"
+import {CopyMember,copyFunction,Copier} from "./public"
 import {TypeReviverArray} from "type-reviver"
 
 
@@ -37,6 +37,15 @@ declare global {
 
 export const Date_Copier:Copier<Date> = function (value,copyMember){
     return new Date(value.getTime());
+}
+
+
+// Array ----------
+
+export const Array_Copier:Copier<Array<any>> = function (value,copyMember){
+    return value.map(function (val, index, array) {
+        return copyMember(val,index);
+    });
 }
 
 
@@ -100,8 +109,12 @@ export const Function_Copier:Copier<Function> = function (value,copyMember){
 
 
 
+
+
+
 export const presetTypeCopierArray:TypeReviverArray<Copier> = [
     [Date,Date_Copier],
+    [Array,Array_Copier],
     [Map,Map_Copier],
     [Set,Set_Copier],
     [URL,URL_Copier],

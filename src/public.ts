@@ -5,6 +5,17 @@ export type Copier<T = any,Host = any> = (this:T,value:T,copyMember:CopyMember,k
 
 
 
+
+export interface Copyable {
+    getCopy:Copier<this>;
+}
+
+export function isCopyable(target:any):target is Copyable {
+    return target && typeof target.getCopy === "function";
+}
+
+
+
 /*
 考虑到安全和性能的原因，弃用 eval，改用 Function 的方式；
 */

@@ -45,7 +45,7 @@ description: ${pkg.description || ""}
 	// 要插入到生成文件底部的字段串；
 	// footer:"",
 
-	// 输出文件的存放目录；只用于会生成多个 chunks 的时候 
+	// 输出文件的存放目录；只用于会生成多个 chunks 的时候
 	dir:"./",
 	// 生成 chunks 名字的格式
 	entryFileNames:`${outputDir}/${removeScope(pkg.name)}.[format].js`
