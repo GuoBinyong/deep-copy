@@ -62,6 +62,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "com-tools": "^2.0.0",
     "type-reviver": "^1.0.2",
     "type-tls": "^2.0.1"
   }

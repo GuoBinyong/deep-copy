@@ -1,35 +1,6 @@
-import {CopyMember,copyFunction,Copier} from "./public"
+import {Copier} from "./public"
 import {TypeReviverArray} from "type-reviver"
-
-
-/*
-
-declare global {
-    interface Date {
-        getCopy(value:this,copyMember:CopyMember,key:any,host:any,type:string,depth:number):this;
-    }
-
-    interface Map<K, V> {
-        getCopy(value:this,copyMember:CopyMember,key:any,host:any,type:string,depth:number):this;
-    }
-
-    interface Set<T> {
-        getCopy(value:this,copyMember:CopyMember,key:any,host:any,type:string,depth:number):this;
-    }
-
-    interface URL {
-        getCopy(value:this,copyMember:CopyMember,key:any,host:any,type:string,depth:number):this;
-    }
-
-    interface RegExp {
-        getCopy(value:this,copyMember:CopyMember,key:any,host:any,type:string,depth:number):this;
-    }
-
-    interface Function {
-        getCopy(value:this,copyMember:CopyMember,key:any,host:any,type:string,depth:number):this;
-    }
-}
-*/
+import {copyFunction} from "com-tools"
 
 
 // Date ----------
