@@ -1,6 +1,6 @@
 {
   "name": "@gby/deep-copy",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "deep-copy 深拷贝，可对任意数据进行深度拷贝，包括 函数 function、正则 RegExp、Map、Set、Date、Array、URL 等等；支持扩展，可根据数据类型定制拷贝逻辑，也可指定拷贝深度；所以，通过它可实现对任意类型的数据进行任意想要的拷贝",
   "main": "dist/deep-copy.cjs.js",
   "module": "dist/deep-copy.es.js",
