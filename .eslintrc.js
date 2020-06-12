@@ -29,8 +29,8 @@ module.exports = {
         // 警告 case 穿透
         "no-fallthrough":'warn',
         // 优先用 const
-        "prefer-const":"warn",
+        // "prefer-const":"warn",
         // 无用了变量声明
-        "no-unused-vars":"warn",
+        // "no-unused-vars":"warn",
     }
 };
