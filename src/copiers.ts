@@ -6,7 +6,7 @@ import {copyFunction} from "com-tools"
 // Date ----------
 
 
-export const Date_Copier:Copier<Date> = function (value,copyMember){
+export const Date_Copier:Copier<Date> = function (value){
     return new Date(value.getTime());
 }
 
@@ -14,8 +14,8 @@ export const Date_Copier:Copier<Date> = function (value,copyMember){
 // Array ----------
 
 export const Array_Copier:Copier<Array<any>> = function (value,copyMember){
-    return value.map(function (val, index, array) {
-        return copyMember(val,index);
+    return value.map(function (val, index) {
+        return copyMember(val,index,value);
     });
 }
 
@@ -25,8 +25,8 @@ export const Array_Copier:Copier<Array<any>> = function (value,copyMember){
 
 export const Map_Copier:Copier<Map<any,any>> = function (value,copyMember){
     const copy = new Map();
-    value.forEach(function (value, key, map) {
-        copy.set(key,copyMember(value,key));
+    value.forEach(function (value, key) {
+        copy.set(key,copyMember(value,key,value));
     });
     return copy;
 }
@@ -54,7 +54,7 @@ const Set_Copier:Copier<Set<any>>  = function (value,copyMember){
 
 // URL ----------
 
-export const URL_Copier:Copier<URL> = function (value,copyMember){
+export const URL_Copier:Copier<URL> = function (value){
     return new URL(value.href);
 }
 
@@ -64,7 +64,7 @@ export const URL_Copier:Copier<URL> = function (value,copyMember){
 
 // RegExp ----------
 
-export const RegExp_Copier:Copier<RegExp> = function (value,copyMember){
+export const RegExp_Copier:Copier<RegExp> = function (value){
     return new RegExp(value);
 }
 
@@ -73,7 +73,7 @@ export const RegExp_Copier:Copier<RegExp> = function (value,copyMember){
 
 // Function ----------
 
-export const Function_Copier:Copier<Function> = function (value,copyMember){
+export const Function_Copier:Copier<Function> = function (value){
     return copyFunction(value);
 }
 
