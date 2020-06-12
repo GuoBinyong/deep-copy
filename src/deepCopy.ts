@@ -1,16 +1,19 @@
 import {TypeRevivers,TypeReviverObject,toTypeReviverObject,TypeReviverMap,mergeTypeRevivers} from "type-reviver"
 import {isBaseType,getExactTypeNameOf} from "type-tls"
-import {Copier} from "./public"
+import {Copier，OnlyEnumerated} from "./public"
 import {presetTypeCopierArray} from "./copiers"
 
 
 
 
 
+
 export interface DeepCopy {
-    <V>(value:V,typeCopyers?:TypeRevivers<Copier>|null,maxDepth?:number):V;
+    <V>(value:V,typeCopyers?:TypeRevivers<Copier>|null,maxDepth?:number,onlyEnumerated?:OnlyEnumerated):V;
     presetTypeCopierMap: TypeReviverMap<Copier>;
 }
+
+
 
 
 /**
@@ -27,7 +30,7 @@ export interface DeepCopy {
  * rawCopyMap 可使被拷贝的对象 中 若存在 不在同一条属性链上的 多个属性 引用 同一对象时，拷贝后的副本仍然也保持 这种引用关系；
  * 但仍然不能还原 在同一条属性链上的多个属性的循环引用关系 以及 该种循环引用导致的调用栈 溢出问题；这种问题我也有办法解决（通过点位值 和 延迟设置），但目前不打算实现，因为个人觉得意义不大；
  */
-function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverObject<Copier>,maxDepth:number,startDepth:number,rawCopyMap:Map<any,any>,key?:Key,host?:Host):V {
+function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverObject<Copier>,maxDepth:number,startDepth:number,rawCopyMap:Map<any,any>,onlyEnumerated?:OnlyEnumerated,key?:Key,host?:Host):V {
 
     /**
      * 这里 用的是 maxDepth < depth 而不是 maxDepth <= depth ，原因如下：
@@ -45,9 +48,10 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
 
     const nextDepth = startDepth + 1;
 
-    function copyMember<T,K,H>(member:T,key?:K,host:H|V = value,memberDepth?:number):T {
+    function copyMember<T,K,H>(member:T,key?:K,onlyEnum?:OnlyEnumerated,host:H|V = value,memberDepth?:number):T {
+        onlyEnum = onlyEnum == null ? onlyEnumerated : onlyEnum;
         const memDepth = memberDepth == null ? nextDepth : memberDepth;
-        return deepCopyByRecursive(member,typeReviverObject,maxDepth,memDepth,rawCopyMap,key,host);
+        return deepCopyByRecursive(member,typeReviverObject,maxDepth,memDepth,rawCopyMap,onlyEnum,key,host);
     }
 
 
@@ -55,13 +59,13 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
 
     const copier:Copier = typeReviverObject[typeName];
     if (typeof copier === "function"){
-        const itemCopy = copier.call(value,value,copyMember,key,host,typeName,startDepth);
+        const itemCopy = copier.call(value,value,copyMember,onlyEnumerated,key,host,typeName,startDepth);
         rawCopyMap.set(value,itemCopy);
         return  itemCopy;
     }
 
     if (typeof (<any>value).getCopy === "function"){
-        const itemCopy = (<any>value).getCopy(value,copyMember,key,host,typeName,startDepth)
+        const itemCopy = (<any>value).getCopy(value,copyMember,onlyEnumerated,key,host,typeName,startDepth)
         rawCopyMap.set(value,itemCopy);
         return itemCopy;
     }
@@ -71,7 +75,7 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
         let index = 0;
         // @ts-ignore
         for (const item of value){
-            const itemCopy = deepCopyByRecursive(item,typeReviverObject,maxDepth,nextDepth,rawCopyMap,index,value);
+            const itemCopy = deepCopyByRecursive(item,typeReviverObject,maxDepth,nextDepth,rawCopyMap,onlyEnumerated,index,value);
             valCopy.push(itemCopy);
             rawCopyMap.set(value,itemCopy);
             ++index;
@@ -94,11 +98,20 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
         valCopy = Object.create(null)
     }
 
-    const allKeys = Object.getOwnPropertyNames(value);
+
+    if (onlyEnumerated){
+        var allKeys = Object.keys(value);
+    }else {
+        allKeys = Object.getOwnPropertyNames(value);
+    }
+
+
 
     return  allKeys.reduce(function (obj,key) {
         const propVal = (<any>value)[key];
-        const itemCopy = deepCopyByRecursive(propVal,typeReviverObject,maxDepth,nextDepth,rawCopyMap,key,value);
+        const itemCopy = deepCopyByRecursive(propVal,typeReviverObject,maxDepth,nextDepth,rawCopyMap,onlyEnumerated,key,value);
+        const propDes = Object.getOwnPropertyDescriptor(value,key);
+        Object.defineProperty(obj,key,propDes as PropertyDescriptor);
         obj[key] = itemCopy
         rawCopyMap.set(propVal,itemCopy);
         return obj;
@@ -112,7 +125,7 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
 
 export function createDeepCopy(presetTypeCopierMap?:TypeReviverMap<Copier>):DeepCopy {
 
-    function deepCopy<V,Key,Host>(value:V,typeCopyers?:TypeRevivers<Copier>|null,maxDepth?:number):V {
+    function deepCopy<V,Key,Host>(value:V,typeCopyers?:TypeRevivers<Copier>|null,maxDepth?:number,onlyEnumerated?:OnlyEnumerated):V {
 
         if (maxDepth == undefined){
             maxDepth = Infinity;
@@ -121,7 +134,7 @@ export function createDeepCopy(presetTypeCopierMap?:TypeReviverMap<Copier>):Deep
         const presetTCMap = deepCopy.presetTypeCopierMap;
         const mergedTCArr = mergeTypeRevivers(presetTCMap.size > 0 ? presetTCMap : null,typeCopyers);
         const trObj = toTypeReviverObject(mergedTCArr);
-        return deepCopyByRecursive(value,trObj,maxDepth,0,new Map());
+        return deepCopyByRecursive(value,trObj,maxDepth,0,new Map(),onlyEnumerated);
     }
 
 

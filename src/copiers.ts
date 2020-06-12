@@ -15,7 +15,7 @@ export const Date_Copier:Copier<Date> = function (value){
 
 export const Array_Copier:Copier<Array<any>> = function (value,copyMember){
     return value.map(function (val, index) {
-        return copyMember(val,index,value);
+        return copyMember(val,index);
     });
 }
 
@@ -26,7 +26,7 @@ export const Array_Copier:Copier<Array<any>> = function (value,copyMember){
 export const Map_Copier:Copier<Map<any,any>> = function (value,copyMember){
     const copy = new Map();
     value.forEach(function (value, key) {
-        copy.set(key,copyMember(value,key,value));
+        copy.set(key,copyMember(value,key));
     });
     return copy;
 }

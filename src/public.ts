@@ -1,7 +1,11 @@
+/**
+ * 当值为 null 或  undefined 时，表示使用默认值；
+ */
+export type OnlyEnumerated = boolean | null | undefined ;
 
-export type CopyMember<T = any,K = any,H = any> = (member:T,key?:K,host?:H,depth?:number)=>T;
+export type CopyMember<T = any,K = any,H = any> = (member:T,key?:K,onlyEnumerated?:OnlyEnumerated,host?:H,depth?:number)=>T;
 
-export type Copier<T = any,Host = any> = (this:T,value:T,copyMember:CopyMember,key:any,host:Host,type:string,depth:number)=>T
+export type Copier<T = any,Host = any> = (this:T,value:T,copyMember:CopyMember,onlyEnumerated:OnlyEnumerated,key:any,host:Host,type:string,depth:number)=>T
 
 
 
