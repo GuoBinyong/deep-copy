@@ -1,6 +1,6 @@
 import {Copier} from "./public"
 import {TypeReviverArray} from "type-reviver"
-import {copyFunction} from "com-tools"
+import {copyConstructor} from "com-tools"
 
 
 // Date ----------
@@ -74,7 +74,7 @@ export const RegExp_Copier:Copier<RegExp> = function (value){
 // Function ----------
 
 export const Function_Copier:Copier<Function> = function (value){
-    return copyFunction(value);
+    return copyConstructor(value);
 }
 
 

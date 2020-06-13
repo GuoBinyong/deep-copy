@@ -1,6 +1,6 @@
 import {TypeRevivers,TypeReviverObject,toTypeReviverObject,TypeReviverMap,mergeTypeRevivers} from "type-reviver"
 import {isBaseType,getExactTypeNameOf} from "type-tls"
-import {Copier，OnlyEnumerated} from "./public"
+import {Copier, OnlyEnumerated} from "./public"
 import {presetTypeCopierArray} from "./copiers"
 
 
