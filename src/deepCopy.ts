@@ -17,6 +17,13 @@ export interface DeepCopy {
 
 
 /**
+ * 默认 Copier 的 TypeName
+ */
+export const typeNameOfDefaultCopier = "default";
+
+
+
+/**
  * 深拷贝的核心函数
  * @param value
  * @param typeReviverObject
@@ -71,10 +78,10 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
     }
 
 
-    const typeName_default = "default";
-    const defaultCopier:Copier = typeReviverObject[typeName_default];
+    const defaultTypeName = typeNameOfDefaultCopier;
+    const defaultCopier:Copier = typeReviverObject[defaultTypeName];
     if (typeof defaultCopier === "function"){
-        const itemCopy = defaultCopier.call(value,value,copyMember,onlyEnumerated,key,host,typeName_default,startDepth);
+        const itemCopy = defaultCopier.call(value,value,copyMember,onlyEnumerated,key,host,defaultTypeName,startDepth);
         rawCopyMap.set(value,itemCopy);
         return  itemCopy;
     }
