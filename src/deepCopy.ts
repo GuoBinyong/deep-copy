@@ -70,6 +70,16 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
         return itemCopy;
     }
 
+
+    const typeName_default = "default";
+    const defaultCopier:Copier = typeReviverObject[typeName_default];
+    if (typeof defaultCopier === "function"){
+        const itemCopy = defaultCopier.call(value,value,copyMember,onlyEnumerated,key,host,typeName_default,startDepth);
+        rawCopyMap.set(value,itemCopy);
+        return  itemCopy;
+    }
+
+
     if (typeof (<any>value)[Symbol.iterator] === "function"){
         const valCopy = [];
         let index = 0;
