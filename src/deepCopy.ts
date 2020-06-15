@@ -9,7 +9,14 @@ import {presetTypeCopierArray} from "./copiers"
 
 
 export interface DeepCopy {
-    <V>(value:V,typeCopyers?:TypeRevivers<Copier>|null,maxDepth?:number,onlyEnumerated?:OnlyEnumerated):V;
+    /**
+     * 深拷贝
+     * @param value
+     * @param typeCopyers
+     * @param maxDepth ? : number|null   可选；默认值为：Infinity；拷贝的最大深度；当值为 undefined 或 null 时，会使用默认值，表示无限深度；
+     * @param onlyEnumerated
+     */
+    <V>(value:V,typeCopyers?:TypeRevivers<Copier>|null,maxDepth?:number|null,onlyEnumerated?:OnlyEnumerated):V;
     presetTypeCopierMap: TypeReviverMap<Copier>;
 }
 
@@ -142,7 +149,7 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
 
 export function createDeepCopy(presetTypeCopierMap?:TypeReviverMap<Copier>):DeepCopy {
 
-    function deepCopy<V,Key,Host>(value:V,typeCopyers?:TypeRevivers<Copier>|null,maxDepth?:number,onlyEnumerated?:OnlyEnumerated):V {
+    function deepCopy<V,Key,Host>(value:V,typeCopyers?:TypeRevivers<Copier>|null,maxDepth?:number|null,onlyEnumerated?:OnlyEnumerated):V {
 
         if (maxDepth == undefined){
             maxDepth = Infinity;
