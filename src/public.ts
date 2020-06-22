@@ -11,9 +11,9 @@ export type AllOwnProperties = boolean | null | undefined ;
  * @param host ?:any    可选；成员 member 所属的宿主对象；默认值：传给 copier 的 value ；
  * @param depth ?:number   可选；member 的深度值； 默认值：depth + 1，depth 是传给 copier 的 depth 参数值；成员
  */
-export type CopyMember<T = any,K = any,H = any> = (member:T,key?:K,allOwnProperties?:AllOwnProperties,host?:H,depth?:number)=>T;
+export type CopyMember<T = any,K = any,H = any> = (member:T,key?:K,allOwnProperties?:AllOwnProperties,host?:H,depth?:number,copyFun?:boolean | null | undefined)=>T;
 
-export type Copier<T = any,Host = any> = (this:T,value:T,copyMember:CopyMember,allOwnProperties:AllOwnProperties,key:any,host:Host,type:string,depth:number)=>T
+export type Copier<T = any,Host = any> = (this:T,value:T,copyMember:CopyMember,allOwnProperties:AllOwnProperties,key:any,host:Host,type:string,depth:number,copyFun:boolean)=>T
 
 
 
