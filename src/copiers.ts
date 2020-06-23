@@ -1,5 +1,5 @@
-import {Copier} from "./public"
-import {TypeReviverArray} from "type-reviver"
+import type {Copier} from "./public"
+import type {TypeReviverArray} from "type-reviver"
 import {copyConstructor} from "com-tools"
 
 

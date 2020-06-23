@@ -64,6 +64,6 @@
   "dependencies": {
     "com-tools": "^2.1.0",
     "type-reviver": "^1.0.2",
-    "type-tls": "^2.0.1"
+    "type-tls": "^2.1.0"
   }
 }
