@@ -1,11 +1,14 @@
-import {removeScope,getBaseNameOfHumpFormat,getDependencieNames} from "package-tls";
+import {removeScope,getBaseNameOfHumpFormat,getDependencieNames,toStringTag} from "package-tls";
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
+import json from '@rollup/plugin-json';
 import { terser } from "rollup-plugin-terser";
 import {dirname} from "path"
 import pkg from './package.json';
+
+
 import tsconfig from "./tsconfig.json";
+import typescript from '@rollup/plugin-typescript';
 
 
 // 配置 ---------------------------------
@@ -21,25 +24,23 @@ import tsconfig from "./tsconfig.json";
 共用的配置
 */
 
-
-
-
 const input = 'src/index.ts';   // 输入（入口）文件
 const outputDir = dirname(pkg.main || "dist/*");    //输出目录
-
+const pkgName = getBaseNameOfHumpFormat(pkg.name);  //驼峰格式的 pkg.name
+const extensions = ['.tsx', '.ts','.jsx','.mjs', '.js', '.json','.node'];  // 默认查找的文件扩展名
 
 
 // rollup 中共用的 output 选项
 const shareOutput = {
 	// 要插入到生成文件顶部的字段串；
-	banner: `
+	banner: toStringTag(2)`
 /*
-${pkg.name || ""}	${pkg.version? "v"+ pkg.version : ""}
-author: ${pkg.author || ""}
-license: ${pkg.license || ""}
-homepage: ${pkg.homepage || ""}
-repository: ${(pkg.repository && pkg.repository.url) || ""}
-description: ${pkg.description || ""}
+${pkg.name}	${pkg.version && "v"+ pkg.version}
+author: ${pkg.author}
+license: ${pkg.license}
+homepage: ${pkg.homepage}
+repository: ${pkg.repository}
+description: ${pkg.description}
 */
 `,
 	// 要插入到生成文件底部的字段串；
@@ -71,8 +72,9 @@ const shareConf = {
 			extensions   类型: Array[...String]    默认值: ['.mjs', '.js', '.json', '.node']
 			扩展文件名
 			*/
-			extensions:['.ts', '.mjs', '.js', '.json', '.node']
+			extensions:extensions
 		}),
+		json(), //将 json 文件转为 ES6 模块
 		commonjs(), // 将依赖的模块从 CommonJS 模块规范转换成 ES2015 模块规范
 		typescript({
 			// 如果 tsconfig 中的 declarationDir 没有定义，则优先使用 package.json 中的 types 或 typings 定义的目录， 默认值：outputDir
@@ -88,9 +90,9 @@ const shareConf = {
 // 导出的 rollup 配置
 export default [
 	/*
-	模块友好的构建
+	适合模块的构建
 	特点：
-	   - 仅只能以 js模块 的方式被引入
+	   - 以 js模块 的方式被引入
 	   - 移除了 node_modules 中的所有依赖
 	*/
 	{
@@ -98,26 +100,36 @@ export default [
 		output: [
 			{...shareOutput, format: 'es' },  // ES module
 			{...shareOutput, format: 'cjs' }, // CommonJS
+			{...shareOutput, format: 'amd' }, // amd
+			/*
+			umd：兼容各种引入方式
+			可以以 AMD 或 CommonJS 模块的方式引入，也可以用 <script> 标签直接引入;
+			由于包中删除了依赖，所以若以 <script> 标签的方式引入，则需要用 <script> 标签的方式先将其依赖引入
+			*/
+			{
+				...shareOutput,
+				format: 'umd',
+				name: pkgName,  //驼峰格式的 pkg.name
+				plugins: [terser()]     //压缩代码
+			} // umd
 		]
 	},
 
-
 	/*
-	兼容各种引入方式的构建
+	适合直接执行的构建
 	特点：
 	   - 可用 <script> 标签直接引入
-	   - 也可用 AMD、CommonJS 的模块化方案引入
 	   - 将所有依赖都构建在了一起
 	   - 对代码进行了压缩
 	*/
 	{
 		...shareConf,
-        external:getDependencieNames(pkg,"peerDependencies"),   //只移除 peerDependencies 中的依赖
+		external:getDependencieNames(pkg,"peerDependencies"),   //只移除 peerDependencies 中的依赖
 		output: {
 			...shareOutput,
-			format: 'umd',
-			name: getBaseNameOfHumpFormat(pkg.name),  //驼峰格式的 pkg.name
+			format: 'iife',
+			name: pkgName,  //驼峰格式的 pkg.name
 			plugins: [terser()]     //压缩代码
-		}  // umd
+		}  // iife
 	}
 ];

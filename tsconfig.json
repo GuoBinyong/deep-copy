@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ESNEXT",
+    "target": "ES5",
     "module": "ESNext",
     "lib": [
       "DOM",
@@ -12,6 +12,7 @@
     "downlevelIteration": true,
     "strict": true,
     "moduleResolution": "node",
+    "resolveJsonModule":true,
     "esModuleInterop": true
   },
   "exclude": [

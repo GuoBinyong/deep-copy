@@ -28,9 +28,9 @@ module.exports = {
         "no-var":'off',
         // 警告 case 穿透
         "no-fallthrough":'warn',
-        // 优先用 const
-        // "prefer-const":"warn",
-        // 无用了变量声明
-        // "no-unused-vars":"warn",
+        // 无用变量
+        "no-unused-vars": "off",
+        // typescript 的 无用变量
+        "@typescript-eslint/no-unused-vars": "error",
     }
 };
