@@ -173,10 +173,6 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
 
 export function createDeepCopy(presetTypeCopierMap?:TypeReviverMap<Copier>):DeepCopy {
 
-
-    // function deepCopy<V>(value:V,typeCopyers?:TypeRevivers<Copier>|null|undefined,options?:DeepCopyOptions):V;
-    // function deepCopy<V>(value:V,completeCB:CompleteCB<V>,typeCopyers?:TypeRevivers<Copier>|null|undefined,options?:DeepCopyOptions):void;
-    // function deepCopy<V>(value:V,cbOrTypeCopyers?:CompleteCB<V>|TypeRevivers<Copier>|null|undefined,typeCopyersOrOpts?:TypeRevivers<Copier>|null|undefined|DeepCopyOptions,opts?:DeepCopyOptions) {
     function deepCopy<V>(value:V,completeCB?:CompleteCB<V>|null|undefined,options?:DeepCopyOptions) {
 
         if (options){

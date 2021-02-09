@@ -14,9 +14,15 @@ export const Date_Copier:Copier<Date> = function (value){
 // Array ----------
 
 export const Array_Copier:Copier<Array<any>> = function (value,copyMember){
-    return value.map(function (val, index) {
-        return copyMember(val,index);
-    });
+    return value.reduce(function (valCopy,item, index) {
+        valCopy.push(undefined);
+        copyMember(item,function (itemCopy) {
+            valCopy.splice(index,1,itemCopy);
+        },index);
+
+        return valCopy;
+    },[]);
+
 }
 
 
@@ -24,11 +30,13 @@ export const Array_Copier:Copier<Array<any>> = function (value,copyMember){
 // Map ----------
 
 export const Map_Copier:Copier<Map<any,any>> = function (value,copyMember){
-    const copy = new Map();
-    value.forEach(function (value, key) {
-        copy.set(key,copyMember(value,key));
+    const valCopy = new Map();
+    value.forEach(function (item, key) {
+        copyMember(item,function (itemCopy) {
+            valCopy.set(key,itemCopy);
+        },key);
     });
-    return copy;
+    return valCopy;
 }
 
 
@@ -40,13 +48,15 @@ export const Map_Copier:Copier<Map<any,any>> = function (value,copyMember){
 // Set ----------
 
 const Set_Copier:Copier<Set<any>>  = function (value,copyMember){
-    const copy = new Set();
+    const valCopy = new Set();
     let index = 0;
     for (const item of value){
-        copy.add(copyMember(item,index));
+        copyMember(item,function (itemCopy) {
+            valCopy.add(itemCopy);
+        },index);
         ++index;
     }
-    return copy;
+    return valCopy;
 }
 
 
