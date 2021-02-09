@@ -20,7 +20,7 @@ let obj1 = {
 root.sub = obj1;
 
 debugger
-let copy1 = DC.deepCopy(root);
+let copy1 = DC.deepCopy(root,null,{copyFun:true});
 
 
 const isEq = root.sub.sub.root === root
