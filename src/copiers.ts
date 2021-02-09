@@ -100,7 +100,9 @@ export const presetTypeCopierArray:TypeReviverArray<Copier> = [
     [Set,Set_Copier],
     [URL,URL_Copier],
     [RegExp,RegExp_Copier],
-    [[Function,"AsyncFunction","GeneratorFunction"],Function_Copier]
+    [Function,Function_Copier],
+    ["AsyncFunction",Function_Copier],
+    ["GeneratorFunction",Function_Copier]
 ];
 
 
