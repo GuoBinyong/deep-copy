@@ -1,7 +1,7 @@
 {
   "name": "@gby/deep-copy",
   "version": "2.1.1",
-  "description": "deep-copy 深拷贝，可对任意数据进行深度拷贝，包括 函数 function、正则 RegExp、Map、Set、Date、Array、URL 等等；支持扩展，可根据数据类型定制拷贝逻辑，也可指定拷贝深度；所以，通过它可实现对任意类型的数据进行任意想要的拷贝",
+  "description": "deep-copy 深拷贝，可对任意数据进行深度拷贝，包括 函数 function、正则 RegExp、Map、Set、Date、Array、URL 等等；支持含循环引用对象的拷贝，并且不会丢失成员的引用关系 和 类型信息，支持扩展，可根据数据类型定制拷贝逻辑，也可指定拷贝深度；所以，通过它可实现对任意类型的数据进行任意想要的拷贝",
   "main": "dist/deep-copy.cjs.js",
   "module": "dist/deep-copy.es.js",
   "types": "dist/index.d.ts",
@@ -26,13 +26,17 @@
     "recursive clone",
     "function copy",
     "RegExp copy",
+    "loop reference",
     "深拷贝",
     "深度拷贝",
     "深复制",
     "深度复制",
     "深克隆",
     "深度克隆",
-    "函数拷贝"
+    "函数拷贝",
+    "循环引用",
+    "引用关系",
+    "拷贝类型"
   ],
   "author": {
     "name": "郭斌勇",
