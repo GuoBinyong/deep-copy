@@ -64,6 +64,7 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
      * 当 maxDepth === depth 时，当前的 value 还是需要被拷贝的，所以还是要生成 value 的副本，如果直接返回 value ，则是没有拷贝 value
      */
     if (maxDepth < startDepth || (!copyFun && typeof value === "function") || isBaseType(value)){
+        completeCB(value);
         return value;
     }
 
@@ -72,7 +73,8 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
         decide.then(completeCB);
         return decide.value
     }
-    decide = new Decide<V>()
+    decide = new Decide<V>();
+    decide.then(completeCB);
     rawCopyMap.set(value,decide);
 
     const nextDepth = startDepth + 1;
