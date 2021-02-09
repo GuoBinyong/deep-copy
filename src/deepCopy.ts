@@ -16,7 +16,6 @@ export interface DeepCopyOptions {
     maxDepth?:number|null|undefined;     // 可选；默认值为：Infinity；拷贝的最大深度；当值为 undefined 或 null 时，会使用默认值，表示无限深度；
     allOwnProps?:OptionalBoolean;    // 可选；默认值:undefined; 是否要拷贝所有自身的属性，包不可枚举的，但不包括原型链上的属性；true：拷贝对象自身（不包括原型上的）的所有属性（包括不可枚举的）； false : 只拷贝对象自身中（不包括原型上的）可枚举的属性
     copyFun?:OptionalBoolean;  // 可选；默认值：false; 是否要对函数进行深拷贝； true：会对函数进行深拷贝；false：不会对函数进行深拷贝操作，只是引用原来的函数；
-    typeCopyers?:TypeRevivers<Copier>|null|undefined;
 }
 
 
@@ -25,10 +24,12 @@ export interface DeepCopy {
     /**
      * 深拷贝
      * @param value
-     * @param completeCB
      */
-    <V>(value:V,completeCB?:CompleteCB<V>|null|undefined,options?:DeepCopyOptions):V|undefined;
+    <V>(value:V,typeCopyers?:TypeRevivers<Copier>|null|undefined,options?:DeepCopyOptions):V;
 
+    /**
+     * 预设的 TypeCopierMap
+     */
     presetTypeCopierMap: TypeReviverMap<Copier>;
 }
 
@@ -41,23 +42,32 @@ export const typeNameOfDefaultCopier = "default";
 
 
 
+
+/**
+ * deepCopyByRecursive 的参数类型
+ */
+interface DeepCopyByRecursiveOptions<V,Key,Host>{
+    value:V;
+    typeReviverObject:TypeReviverObject<Copier>;
+    // 是否要拷贝所有自身的属性，包不可枚举的，但不包括原型链上的属性；true：拷贝对象自身（不包括原型上的）的所有属性（包括不可枚举的）； false : 只拷贝对象自身中（不包括原型上的）可枚举的属性
+    allOwnProps:boolean;
+    // 是否要对函数进行深拷贝； true：会对函数进行深拷贝；false：不会对函数进行深拷贝操作，只是引用原来的函数；
+    copyFun:boolean;
+    // 默认值为：Infinity；拷贝的最大深度；当值为 undefined 或 null 时，会使用默认值，表示无限深度；
+    maxDepth:number;
+    startDepth:number;
+    //用于保存 被拷贝的对象 和 其对应的 副本 的 Map
+    rawCopyMap:Map<any,Decide>;
+    completeCB?:CompleteCB<V>|null|undefined;
+    key?:Key;
+    host?:Host;
+}
+
 /**
  * 深拷贝的核心函数
- * @param value
- * @param typeReviverObject
- * @param maxDepth
- * @param startDepth
- * @param rawCopyMap:Map<any,any>    用于保存 被拷贝的对象 和 其对应的 副本 的 Map
- * @param allOwnProperties?: OptionalBoolean    可选；默认值:undefined; 是否要拷贝所有自身的属性，包不可枚举的，但不包括原型链上的属性
- * @param copyFun?: OptionalBoolean    可选；默认值：false; 是否要对函数进行深拷贝； true：会对函数进行深拷贝；false：不会对函数进行深拷贝操作，只是引用原来的函数；
- * @param key
- * @param host
- *
- * # 说明
- * rawCopyMap 可使被拷贝的对象 中 若存在 不在同一条属性链上的 多个属性 引用 同一对象时，拷贝后的副本仍然也保持 这种引用关系；
- * 但仍然不能还原 在同一条属性链上的多个属性的循环引用关系 以及 该种循环引用导致的调用栈 溢出问题；这种问题我也有办法解决（通过点位值 和 延迟设置），但目前不打算实现，因为个人觉得意义不大；
  */
-function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverObject<Copier>,allOwnProperties:boolean,copyFun:boolean,maxDepth:number,startDepth:number,rawCopyMap:Map<any,Decide>,complete?:CompleteCB<V>|null|undefined,key?:Key,host?:Host):V|undefined {
+function deepCopyByRecursive<V,Key,Host>(options:DeepCopyByRecursiveOptions<V,Key,Host>):V|undefined {
+    const {value,typeReviverObject,allOwnProps:allOwnProperties,copyFun,maxDepth,startDepth,rawCopyMap,completeCB:complete,key,host} = options;
     const completeCB = complete || function () {};
     /**
      * 这里 用的是 maxDepth < depth 而不是 maxDepth <= depth ，原因如下：
@@ -87,7 +97,7 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
         const allOwnProps_Bool = allOwnProps == null ? allOwnProperties : allOwnProps;
         const copyFun_Bool = copyFunction == null ? copyFun : copyFunction;
         const memDepth = depth == null ? nextDepth : depth;
-        return deepCopyByRecursive(member,typeReviverObject,allOwnProps_Bool,copyFun_Bool,maxDepth,memDepth,rawCopyMap,compCB,key,finalHost);
+        return deepCopyByRecursive({value:member,typeReviverObject,allOwnProps:allOwnProps_Bool,copyFun:copyFun_Bool,maxDepth,startDepth:memDepth,rawCopyMap,completeCB:compCB,key,host:finalHost});
     }
 
 
@@ -126,9 +136,13 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
              * 否则，splice 会从元素末尾插入元素，这样有可能会打乱 itemCopy 的原始顺序
              */
             valCopy.push(undefined);
-            deepCopyByRecursive(item,typeReviverObject,allOwnProperties,copyFun,maxDepth,nextDepth,rawCopyMap,function (itemCopy) {
-                valCopy.splice(itemIndex,1,itemCopy);
-            },index,value);
+            deepCopyByRecursive({
+                value:item,typeReviverObject,allOwnProps:allOwnProperties,copyFun,maxDepth,startDepth:nextDepth,rawCopyMap,
+                completeCB:function (itemCopy) {
+                    valCopy.splice(itemIndex,1,itemCopy);
+                },
+                key:index,host:value
+            });
             ++index;
         }
 
@@ -160,11 +174,16 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
 
     for (const key of allKeys){
         const propVal = (<any>value)[key];
-        deepCopyByRecursive(propVal,typeReviverObject,allOwnProperties,copyFun,maxDepth,nextDepth,rawCopyMap,function (itemCopy) {
-            const propDes = Object.getOwnPropertyDescriptor(value,key);
-            Object.defineProperty(valCopy,key,propDes as PropertyDescriptor);
-            valCopy[key] = itemCopy;
-        },key,value);
+        deepCopyByRecursive({
+            value:propVal,typeReviverObject,allOwnProps:allOwnProperties,copyFun,maxDepth,startDepth:nextDepth,rawCopyMap,
+            completeCB:function (itemCopy) {
+               const propDes = Object.getOwnPropertyDescriptor(value,key);
+               Object.defineProperty(valCopy,key,propDes as PropertyDescriptor);
+               valCopy[key] = itemCopy;
+            },
+            key,
+            host:value}
+            );
     }
 
     decide.value = valCopy;
@@ -175,10 +194,10 @@ function deepCopyByRecursive<V,Key,Host>(value:V,typeReviverObject:TypeReviverOb
 
 export function createDeepCopy(presetTypeCopierMap?:TypeReviverMap<Copier>):DeepCopy {
 
-    function deepCopy<V>(value:V,completeCB?:CompleteCB<V>|null|undefined,options?:DeepCopyOptions) {
+    function deepCopy<V>(value:V,typeCopyers?:TypeRevivers<Copier>|null|undefined,options?:DeepCopyOptions):V {
 
         if (options){
-            var {maxDepth,allOwnProps,copyFun,typeCopyers} = options
+            var {maxDepth,allOwnProps,copyFun} = options
         }
 
         const maxDepth_Num = maxDepth == null ? Infinity : maxDepth;
@@ -189,7 +208,7 @@ export function createDeepCopy(presetTypeCopierMap?:TypeReviverMap<Copier>):Deep
         const presetTCMap = deepCopy.presetTypeCopierMap;
         const mergedTCArr = mergeTypeRevivers(presetTCMap.size > 0 ? presetTCMap : null,typeCopyers);
         const trObj = toTypeReviverObject(mergedTCArr);
-        return deepCopyByRecursive(value,trObj,allOwnProps_Bool,copyFun_Bool,maxDepth_Num,0,new Map(),completeCB);
+        return deepCopyByRecursive({value,typeReviverObject:trObj,allOwnProps:allOwnProps_Bool,copyFun:copyFun_Bool,maxDepth:maxDepth_Num,startDepth:0,rawCopyMap:new Map()}) as V;
     }
 
 
