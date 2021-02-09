@@ -19,13 +19,12 @@ let obj1 = {
 
 root.sub = obj1;
 
-
+debugger
 let copy1 = DC.deepCopy(root);
-let copy2 = null;
-DC.deepCopy(root,function (copy) {
-    copy2 = copy
-    debugger
-});
 
+
+const isEq = root.sub.sub.root === root
+const isEq1 = copy1.sub.sub.root === copy1
+const isEq2 = copy1.sub.sub.fun === obj2.fun
 
 debugger
