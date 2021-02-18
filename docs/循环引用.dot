@@ -1,0 +1,7 @@
+digraph 循环引用 {
+    node[color="#5441FA",fontcolor= "#5441FA"]
+    edge[label=sub,color="#BF43F9",fontcolor="#5441FA"]
+    
+    根 -> 成员1 -> 成员2 -> 成员3 -> 成员1
+    根 -> 成员4 
+}

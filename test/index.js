@@ -1,30 +1,32 @@
 const DC = require("../dist/deep-copy.cjs")
 
+
 let root = {
     name:"root"
-}
+};
 
-let obj2 = {
-    name:"obj2",
-    root:root,
+let member1 = {
+    name:"member1",
     fun:function () {
         console.log("这是函数")
     }
-}
-
-let obj1 = {
-    name:"obj1",
-    sub:obj2
-}
-
-root.sub = obj1;
-
-debugger
-let copy1 = DC.deepCopy(root,null,{copyFun:true});
+};
 
 
-const isEq = root.sub.sub.root === root
-const isEq1 = copy1.sub.sub.root === copy1
-const isEq2 = copy1.sub.sub.fun === obj2.fun
+let member2 = {
+    name:"member2",
+};
+
+
+
+
+root.ref = member1;
+member1.ref = member2;
+member2.ref = root;
 
 debugger
+let rootCopy = DC.deepCopy(root,null,{copyFun:true});
+
+console.log(root.ref.ref.ref === root)
+console.log(rootCopy.ref.ref.ref === rootCopy)
+console.log(root.ref.fun === rootCopy.ref.fun)
