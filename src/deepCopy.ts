@@ -25,7 +25,7 @@ export interface DeepCopy {
      * 深拷贝
      * @param value
      */
-    <V>(value:V,typeCopyers?:TypeRevivers<Copier>|null|undefined,options?:DeepCopyOptions):V;
+    <V>(value:V,options?:DeepCopyOptions|null|undefined,typeCopyers?:TypeRevivers<Copier>|null|undefined):V;
 
     /**
      * 预设的 TypeCopierMap
@@ -192,9 +192,9 @@ function deepCopyByRecursive<V,Key,Host>(options:DeepCopyByRecursiveOptions<V,Ke
 
 
 
-export function createDeepCopy(presetTypeCopierMap?:TypeReviverMap<Copier>):DeepCopy {
+export function createDeepCopy(presetTypeCopierMap?:TypeReviverMap<Copier>|null|undefined):DeepCopy {
 
-    function deepCopy<V>(value:V,typeCopyers?:TypeRevivers<Copier>|null|undefined,options?:DeepCopyOptions):V {
+    function deepCopy<V>(value:V,options?:DeepCopyOptions|null|undefined,typeCopyers?:TypeRevivers<Copier>|null|undefined):V {
 
         if (options){
             var {maxDepth,allOwnProps,copyFun} = options
