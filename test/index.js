@@ -20,13 +20,13 @@ let member2 = {
 
 
 
-root.ref = member1;
-member1.ref = member2;
-member2.ref = root;
+root.sub = member1;
+member1.sub = member2;
+member2.sub = root;
 
 debugger
 let rootCopy = DC.deepCopy(root,null,{copyFun:true});
 
-console.log(root.ref.ref.ref === root)
-console.log(rootCopy.ref.ref.ref === rootCopy)
-console.log(root.ref.fun === rootCopy.ref.fun)
+console.log(root.sub.sub.sub === root)
+console.log(rootCopy.sub.sub.sub === rootCopy)
+console.log(root.sub.fun === rootCopy.sub.fun)
