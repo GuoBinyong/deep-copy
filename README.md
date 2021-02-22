@@ -1,5 +1,5 @@
-[教程]: ./doc/教程.md
-[API接口文档]: ./doc/API.md
+[教程]: ./docs/教程.md
+[API接口文档]: ./docs/API.md
 
 [GitHub仓库]: https://github.com/GuoBinyong/deep-copy
 [发行地址]: https://github.com/GuoBinyong/deep-copy/releases
