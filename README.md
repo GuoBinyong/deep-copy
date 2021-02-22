@@ -9,6 +9,8 @@
 
 
 
+[循环引用]: ./docs/assets/循环引用.svg
+
 目录
 =========
 
@@ -38,7 +40,7 @@
 
 但这些方法有以下缺点：
 - 不支持对象成员循环引用，比如下面这种：
-<!-- @import "docs/循环引用.dot" -->
+   ![循环引用][]
 - 拷贝后会丢失类型信息，变成了普通的对象
 - 拷贝后会丢失成员引用关系信息
 - 不能根据类型自定义拷贝规则
@@ -116,7 +118,7 @@ import deepCopy from "path/to/package/deep-copy";
    <script src="path/to/package/deep-copy.iife.js"></script>
    ```
    
-2. 使用全局的 `createStorageData()`
+2. 使用全局的 `deepCopy`
    ```
    <script>
    // 使用全局的 deepCopy
